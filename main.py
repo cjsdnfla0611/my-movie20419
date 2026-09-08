@@ -54,4 +54,3 @@ if not api_key:
         "2. 아래와 같이 KOBIS_KEY를 설정해 주세요.\n\n"
         "```toml\n"
         'KOBIS_KEY = "발급받은_인증키_입력"\n'
-        "
