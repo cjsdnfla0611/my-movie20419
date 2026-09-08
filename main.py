@@ -29,7 +29,7 @@ def fetch_box_office_data(target_date: str, api_key: str):
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         return response.json()
-    except Exception as e:
+    except Exception:
         # 네트워크 에러 등 발생 시 None 반환
         return None
 
@@ -111,7 +111,7 @@ if not movie_list:
 
 
 # -----------------------------------------------------------------------------
-# 5. 데이터 전처리 (문자열 -> 숫자 변환)
+# 5. 데이터 전처리 (문자열 -> 숫자 변환 및 정렬)
 # -----------------------------------------------------------------------------
 df = pd.DataFrame(movie_list)
 
@@ -125,12 +125,12 @@ for col in target_cols:
     else:
         df[col] = 0
 
-# 순위 기준 정렬
+# 순위 기준 기본 정렬
 df = df.sort_values(by="rank", ascending=True)
 
 
 # -----------------------------------------------------------------------------
-# 6. 화면 출력 (1위 지표 카드, 상위 5개 그래프, 전체 표)
+# 6. 화면 출력 (1위 지표 카드, 상위 5개 관객수 그래프, 전체 표)
 # -----------------------------------------------------------------------------
 
 # [1위 영화 지표 카드]
@@ -154,10 +154,13 @@ col3.metric(
 
 st.divider()
 
-# [관객 수 상위 5편 막대그래프]
-st.markdown("### 📊 관객 수 상위 5개 영화")
-top_5_df = df.head(5)
+# [관객 수 기준 Top 5 막대그래프]
+st.markdown("### 📊 관객 수 Top 5 영화")
 
+# 어제 관객 수(audiCnt) 내림차순 정렬 후 상위 5개 추출
+top_5_df = df.sort_values(by="audiCnt", ascending=False).head(5)
+
+# Streamlit 내장 막대그래프 출력
 st.bar_chart(
     data=top_5_df,
     x="movieNm",
